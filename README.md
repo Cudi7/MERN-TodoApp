@@ -13,9 +13,10 @@
 ## Table of contents
 
 - [General info](#general-info)
-- [Setup](#setup)
-- [Code Examples](#code-examples)
 - [Features](#features)
+- [Code Examples](#code-examples)
+- [Setup](#setup)
+- [Technologies](#technologies)
 - [Status](#status)
 - [Inspiration](#inspiration)
 - [Contact](#contact)
@@ -25,6 +26,15 @@
 Following my training I decided to create something that I could do to put more or less all the things I know about React.
 
 You are watching v2, this includes Node, Express and MongoDB
+
+## Features
+
+You can:
+
+- Toggle complete state, Add, Remove and Edit a todo
+- Make it Public or Private
+- See all Public Todos
+- Register, Login and Logout
 
 ## Code Examples
 
