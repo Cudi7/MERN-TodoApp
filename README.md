@@ -17,8 +17,6 @@
 - [Code Examples](#code-examples)
 - [Setup](#setup)
 - [Technologies](#technologies)
-- [Status](#status)
-- [Inspiration](#inspiration)
 - [Contact](#contact)
 
 ## General info
