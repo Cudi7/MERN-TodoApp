@@ -81,7 +81,7 @@ export const todosSlice = createSlice({
 });
 ```
 
-## Features
+## Technologies
 
 The project is created with:
 
