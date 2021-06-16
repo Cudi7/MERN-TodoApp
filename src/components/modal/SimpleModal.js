@@ -4,8 +4,9 @@ import Modal from '@material-ui/core/Modal';
 import BlockIcon from '@material-ui/icons/Block';
 import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople';
 import { Box, Button, IconButton, Tooltip } from '@material-ui/core';
-import { useDispatch } from 'react-redux';
-import { togglePublic } from '../../store/todos/todosSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { displayPublicTodos, togglePublic } from '../../store/todos/todosSlice';
+import { selectCurrentUser } from '../../store/auth/authSlice';
 
 function getModalStyle() {
   return {
@@ -26,12 +27,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function SimpleModal({ btnType, id }) {
+function SimpleModal({ btnType, id, todo }) {
   const [modalStyle] = useState(getModalStyle);
   const [open, setOpen] = useState({ type: '', isOpen: false });
   const [btnAction, setBtnAction] = useState(false);
 
   const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser());
+
   const classes = useStyles();
 
   const todoType = open.type === 'public' ? 'public' : 'private';
@@ -46,16 +49,20 @@ function SimpleModal({ btnType, id }) {
   };
 
   useEffect(() => {
-    btnAction && dispatch(togglePublic(id));
-    setBtnAction(false);
-  }, [btnAction, id, dispatch]);
+    if (btnAction) {
+      dispatch(togglePublic({ todo, id: currentUser.user.id }));
+      setBtnAction(false);
+    }
+  }, [btnAction]);
 
   const body = (
     <>
       <div style={modalStyle} className={classes.paper}>
         <h2 id="simple-modal-title">Hi🖐🏽 I'm a {todoType} todo.</h2>
         <p id="simple-modal-description">
-          Do you wish to change it to {todoChange}?
+          {currentUser.user.id
+            ? `Do you wish to change it to ${todoChange}`
+            : 'Sorry, you need to Login to change the todo state'}
         </p>
         <Box style={{ marginTop: '1rem' }}>
           <Button
@@ -65,8 +72,12 @@ function SimpleModal({ btnType, id }) {
           >
             Never Mind
           </Button>
-          <Button variant="contained" color="primary" onClick={handleBtnAction}>
-            Sure I do!
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={currentUser.user.id ? handleBtnAction : handleClose}
+          >
+            {currentUser.user.id ? 'Sure I do!' : 'Ok'}
           </Button>
         </Box>
       </div>

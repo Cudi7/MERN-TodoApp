@@ -1,10 +1,13 @@
-import { apiCallBegan } from '../store/actions';
+import { apiCallBegan } from '../store/auth/actions';
+import { finishLoader, startLoader } from '../store/loading/uiSlice';
 
 const apiMiddleware =
   ({ dispatch }) =>
   (next) =>
   async (action) => {
     if (action.type !== apiCallBegan.type) return next(action);
+
+    dispatch(startLoader());
 
     const { url, method, data, onSuccess, onError } = action.payload;
 
@@ -18,8 +21,10 @@ const apiMiddleware =
           'Content-Type': 'application/json',
         },
       });
-      //t
+
       const dataResponse = await response.json();
+
+      dispatch(finishLoader());
 
       if (dataResponse.error)
         dispatch({ type: onError, payload: dataResponse });
@@ -27,6 +32,7 @@ const apiMiddleware =
         dispatch({ type: onSuccess, payload: { user: dataResponse } });
       }
     } catch (error) {
+      dispatch(finishLoader());
       if (onError)
         dispatch({ type: onError, payload: { message: error.message } });
     }

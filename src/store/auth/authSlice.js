@@ -1,42 +1,42 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
-import { apiCallBegan } from '../actions';
+import { apiCallBegan } from './actions';
 
 //Reducer ******************************************************************************************************
 const authSlice = createSlice({
-  name: 'currentUser',
+  name: 'user',
   initialState: {
-    currentUser: {},
+    user: {},
     status: {},
   },
   reducers: {
-    userRegistered: (state, action) => {
+    registered: (state, action) => {
       state.status = { success: 'Registered!' };
-      state.currentUser = {
+      state.user = {
         id: action.payload.user.id,
         name: action.payload.user.name,
         email: action.payload.user.email,
       };
     },
-    userLogged: (state, action) => {
+    logged: (state, action) => {
       state.status = { success: 'Logged in' };
-      state.currentUser = {
+      state.user = {
         id: action.payload.user.id,
         name: action.payload.user.name,
         email: action.payload.user.email,
       };
     },
 
-    userLoggedOut: (state, action) => {
-      state.currentUser = [];
+    loggedOut: (state, action) => {
+      state.user = [];
       state.status = {};
     },
-    userRegisterFailed: (state, action) => {
+    registerFailed: (state, action) => {
       state.status = action.payload;
     },
-    userLogginFailed: (state, action) => {
+    logginFailed: (state, action) => {
       state.status = action.payload;
     },
-    userAuthStatusRemoved: (state, action) => {
+    statusMessageCleared: (state, action) => {
       state.status = {};
     },
   },
@@ -44,44 +44,43 @@ const authSlice = createSlice({
 
 export default authSlice.reducer;
 const {
-  userLogged,
-  userLoggedOut,
-  userRegisterFailed,
-  userLogginFailed,
-  userRegistered,
-  userAuthStatusRemoved,
+  logged,
+  loggedOut,
+  registerFailed,
+  logginFailed,
+  registered,
+  statusMessageCleared,
 } = authSlice.actions;
 
 //Actions ******************************************************************************************************
-export const logUser = (user) => async (dispatch, getState) => {
+export const logUser = (user) => (dispatch, getState) => {
   dispatch(
     apiCallBegan({
       url: 'login',
       method: 'POST',
       data: user,
-      onSuccess: userLogged.type,
-      onError: userLogginFailed.type,
+      onSuccess: logged.type,
+      onError: logginFailed.type,
     })
   );
 };
 
 export const logoutUser = () => (dispatch) =>
-  dispatch({ type: userLoggedOut.type });
+  dispatch({ type: loggedOut.type });
 
-export const registerUser = (user) => async (dispatch, getState) => {
+export const clearStatusMessage = () => (dispatch) =>
+  dispatch({ type: statusMessageCleared.type });
+
+export const registerUser = (user) => (dispatch, getState) => {
   dispatch(
     apiCallBegan({
       url: 'register',
       method: 'POST',
       data: user,
-      onSuccess: userRegistered.type,
-      onError: userRegisterFailed.type,
+      onSuccess: registered.type,
+      onError: registerFailed.type,
     })
   );
-};
-
-export const removeUserAuthStatus = () => (dispatch) => {
-  dispatch({ type: userAuthStatusRemoved.type });
 };
 
 //Selectors ******************************************************************************************************

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -11,26 +11,32 @@ import Container from '@material-ui/core/Container';
 import useLoginStyles from './LoginStyles';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  clearStatusMessage,
   logUser,
-  removeUserAuthStatus,
   selectCurrentUser,
 } from '../store/auth/authSlice';
-import ErrorMessage from '../components/error/ErrorMessage';
+import Message from '../components/message/Message';
+import Loader from '../components/loader/Loader';
+import { selectLoadingState } from '../store/loading/uiSlice';
 
 export default function Login() {
   const classes = useLoginStyles();
   const dispatch = useDispatch();
   const history = useHistory();
   const currentUser = useSelector(selectCurrentUser());
+  const loader = useSelector(selectLoadingState());
+  const error = currentUser.status.error;
 
   useEffect(() => {
-    if (currentUser.status.error) {
-      setTimeout(() => {
-        dispatch(removeUserAuthStatus());
-      }, 4000);
+    //when mounting component, if error exists (because we are switchin very fast from another page that showed an error) we clean that error, cuz we dont wanna show it here
+    if (error) dispatch(clearStatusMessage());
+  }, []);
+
+  useEffect(() => {
+    if (currentUser.status.success) {
+      history.push('/');
     }
-    if (currentUser.status.success) history.push('/');
-  }, [currentUser.status]);
+  }, [currentUser.status, loader.isLoading]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,7 +54,7 @@ export default function Login() {
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+          {loader.isLoading ? <Loader /> : <LockOutlinedIcon />}
         </Avatar>
         <Typography component="h1" variant="h5">
           Login
@@ -64,7 +70,7 @@ export default function Login() {
             name="email"
             autoComplete="email"
             autoFocus
-            error={currentUser.status.error === "This user doesn't exist"}
+            error={error === "This user doesn't exist"}
           />
           <TextField
             variant="outlined"
@@ -76,12 +82,10 @@ export default function Login() {
             type="password"
             id="password"
             autoComplete="current-password"
-            error={currentUser.status.error === 'Incorrect password'}
+            error={error === 'Incorrect password'}
           />
 
-          {currentUser.status.error && (
-            <ErrorMessage type="error" message={currentUser.status.error} />
-          )}
+          {error && <Message type="error" message={error} />}
 
           <Button
             type="submit"

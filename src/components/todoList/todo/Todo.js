@@ -1,6 +1,5 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -38,15 +37,12 @@ function Todo(props) {
             inputProps={{ 'aria-labelledby': 1 }}
           />
         </ListItemIcon>
-        <ListItemText
-          primary={`${todo.description}`}
-          secondary={`${todo.author}`}
-        />
+        <ListItemText primary={todo.description} secondary={todo.author} />
         <ListItemSecondaryAction>
           {todo.public ? (
-            <SimpleModal btnType={'public'} id={todo.id} />
+            <SimpleModal btnType={'public'} id={todo.id} todo={todo} />
           ) : (
-            <SimpleModal btnType={'private'} id={todo.id} />
+            <SimpleModal btnType={'private'} id={todo.id} todo={todo} />
           )}
 
           <Tooltip title="Edit">

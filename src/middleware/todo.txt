@@ -1,3 +1,6 @@
 
-fix git/github issue with the double branches
-deploy to heroku
+todo:
+
+- once public todos page is fixed, check what can I improve
+
+- once all done, deploy again, server side to heroku, and project to github, change routes to work

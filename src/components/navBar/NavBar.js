@@ -14,7 +14,7 @@ import { logoutUser, selectCurrentUser } from '../../store/auth/authSlice';
 export default function ButtonAppBar() {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const auth = useSelector(selectCurrentUser());
+  const currentUser = useSelector(selectCurrentUser());
 
   return (
     <div className={classes.root}>
@@ -32,18 +32,18 @@ export default function ButtonAppBar() {
           </Link>
 
           <Typography variant="h6" className={classes.title}>
-            {auth.currentUser.name ? auth.currentUser.name : ''}
+            {currentUser.user.name ? currentUser.user.name : ''}
           </Typography>
           <Link to="/public" style={{ textDecoration: 'none', color: 'white' }}>
             <Button color="inherit">Public Todos</Button>
           </Link>
           <Link
-            to={auth.currentUser.id ? '/' : '/login'}
+            to={currentUser.user.id ? '/' : '/login'}
             style={{ textDecoration: 'none', color: 'white' }}
-            onClick={() => auth.currentUser.id && dispatch(logoutUser())}
+            onClick={() => currentUser.user.id && dispatch(logoutUser())}
           >
             <Button color="inherit">
-              {auth.currentUser.id ? 'Logout' : 'Login'}
+              {currentUser.user.id ? 'Logout' : 'Login'}
             </Button>
           </Link>
         </Toolbar>

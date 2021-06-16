@@ -1,42 +1,34 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { List, Typography } from '@material-ui/core';
 
 import useStyles from '../todoList/TodoListStyles';
-import TodoEdit from '../todoList/todo/TodoEdit';
-import Todo from '../todoList/todo/Todo';
-import useLocalStorage from '../../hooks/useLocalStorage';
+import TodoPublic from '../todoList/todo/TodoPublic';
+import {
+  selectPublicTodos,
+  displayPublicTodos,
+} from '../../store/todos/todosSlice';
 
 function TodoListPublic() {
   const classes = useStyles();
-  const [val, handleValue] = useLocalStorage('todos');
-  const todos = useSelector((state) => state.entities.todos);
+  const dispatch = useDispatch();
+  const publicTodos = useSelector(selectPublicTodos());
 
   useEffect(() => {
-    handleValue(todos);
-  }, [todos, handleValue]);
+    dispatch(displayPublicTodos());
+  }, []);
 
   return (
     <div style={{ marginTop: '4rem' }}>
-      {todos.length ? (
-        todos.map((todo) =>
-          todo.editing ? (
-            <List key={todo.id} className={classes.root}>
-              <TodoEdit todo={todo} />
-            </List>
-          ) : (
-            todo.public && (
-              <List key={todo.id} className={classes.root}>
-                <Todo todo={todo} />
-              </List>
-            )
-          )
-        )
+      {publicTodos.length > 0 && !publicTodos.error ? (
+        publicTodos.map((todo) => (
+          <List key={todo.id} className={classes.root}>
+            <TodoPublic todo={todo} />
+          </List>
+        ))
       ) : (
-        <Typography>
-          Currently empty, add a todo and make it public 🤯
-        </Typography>
+        <Typography>{publicTodos.error}</Typography> //{todos.error}
       )}
     </div>
   );

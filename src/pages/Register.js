@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -9,27 +9,33 @@ import Container from '@material-ui/core/Container';
 import { useDispatch, useSelector } from 'react-redux';
 import useRegisterStyles from './RegisterStyles';
 import {
+  clearStatusMessage,
   registerUser,
-  removeUserAuthStatus,
   selectCurrentUser,
 } from '../store/auth/authSlice';
-import ErrorMessage from '../components/error/ErrorMessage';
+import Message from '../components/message/Message';
 import useInputState from '../hooks/useInputState';
+import { selectLoadingState } from '../store/loading/uiSlice';
+import Loader from '../components/loader/Loader';
 
 export default function Register() {
   const classes = useRegisterStyles();
   const dispatch = useDispatch();
   const currentUser = useSelector(selectCurrentUser());
+  const loader = useSelector(selectLoadingState());
   const [value, handleValue, reset] = useInputState('');
+  const error = currentUser.status.error;
 
   useEffect(() => {
-    if (currentUser.status.error) {
+    //when mounting component, if error exists (because we are switchin very fast from another page that showed an error) we clean that error, cuz we dont wanna show it here
+    if (error) dispatch(clearStatusMessage());
+  }, []);
+
+  useEffect(() => {
+    if (error) {
       reset();
-      setTimeout(() => {
-        dispatch(removeUserAuthStatus());
-      }, 10000);
     }
-  }, [currentUser.status]);
+  }, [currentUser.status, loader.isLoading]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,7 +54,7 @@ export default function Register() {
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+          {loader.isLoading ? <Loader /> : <LockOutlinedIcon />}
         </Avatar>
         <Typography component="h1" variant="h5">
           Register
@@ -75,7 +81,7 @@ export default function Register() {
             name="email"
             autoComplete="email"
             autoFocus
-            error={currentUser.status.error === 'User already exists'}
+            error={error === 'User already exists'}
             value={value?.email || ''}
             onChange={handleValue}
           />
@@ -91,9 +97,7 @@ export default function Register() {
             autoComplete="current-password"
           />
 
-          {currentUser.status.error && (
-            <ErrorMessage type="error" message={currentUser.status.error} />
-          )}
+          {error && <Message type="error" message={error} />}
 
           <Button
             type="submit"

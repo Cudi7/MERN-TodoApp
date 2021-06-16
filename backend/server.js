@@ -2,6 +2,7 @@ const express = require('express');
 const serverConnection = require('./config/db');
 const registerController = require('./controllers/registerController');
 const loginController = require('./controllers/loginController');
+const publicController = require('./controllers/publicController');
 const cors = require('cors');
 
 // load config files
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/register', registerController);
 app.use('/login', loginController);
+app.use('/public', publicController);
 
 app.get('/', (req, res) => {
   res.send('TodosApp API');

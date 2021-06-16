@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../store/auth/authSlice';
 
 function Home() {
-  const user = useSelector(selectCurrentUser());
+  const currentUser = useSelector(selectCurrentUser());
 
   return (
     <BrowserRouter>
@@ -29,7 +29,7 @@ function Home() {
         </Route>
 
         <Route exact path="/login">
-          {user.status.success ? (
+          {currentUser.status.success ? (
             <Redirect to="/" />
           ) : (
             <>
@@ -40,7 +40,7 @@ function Home() {
           )}
         </Route>
         <Route exact path="/register">
-          {user.status.success ? (
+          {currentUser.status.success ? (
             <Redirect to="/" />
           ) : (
             <>

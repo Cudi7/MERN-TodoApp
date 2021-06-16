@@ -8,11 +8,12 @@ import Todo from './todo/Todo';
 import TodoEdit from './todo/TodoEdit';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import empty from '../../images/empty.jpg';
+import { selectTodos } from '../../store/todos/todosSlice';
 
 function TodoList() {
   const classes = useStyles();
   const [val, handleValue] = useLocalStorage('todos');
-  const todos = useSelector((state) => state.entities.todos);
+  const todos = useSelector(selectTodos());
 
   useEffect(() => {
     handleValue(todos);
@@ -20,7 +21,7 @@ function TodoList() {
 
   return (
     <List className={classes.root}>
-      {todos.length ? (
+      {todos?.length ? (
         todos.map((todo) =>
           todo.editing ? (
             <TodoEdit key={todo.id} todo={todo} />

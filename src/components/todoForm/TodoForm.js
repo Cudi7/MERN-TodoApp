@@ -1,48 +1,74 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, Paper, TextField } from '@material-ui/core';
 
-import { addTodo } from '../../store/todos/todosSlice';
+import {
+  addTodo,
+  selectTodos,
+  togglePublic,
+} from '../../store/todos/todosSlice';
 import useInputState from '../../hooks/useInputState';
 import SwitchLabels from '../switch/Switch';
-import {
-  selectCurrentUser,
-  removeUserAuthStatus,
-} from '../../store/auth/authSlice';
-import SnackBar from '../snackBar/SnackBar';
+import { selectCurrentUser } from '../../store/auth/authSlice';
+import Message from '../message/Message';
 
 function TodoForm() {
   const dispatch = useDispatch();
-  const user = useSelector(selectCurrentUser());
+  const currentUser = useSelector(selectCurrentUser());
+  const todos = useSelector(selectTodos());
 
-  console.log();
+  const [newTodo, setNewTodo] = useState(false);
+  const firstRender = useRef(false);
 
   const [value, handleValue, reset] = useInputState('');
 
+  useEffect(() => {
+    /*every time we add a new todo, we check if the last added todo its public, if it is,
+    we dispatch togglePublic, and that dispatch function, does a post request to the publicTodos database schema.
+    Also, we are using useRef, because we only want this to fire once the user adds a todo, and not, on the first mounting*/
+    if (firstRender.current && newTodo) {
+      const currentTodo = todos[todos.length - 1];
+      console.log(currentTodo);
+
+      if (currentTodo.public) {
+        dispatch(
+          togglePublic({
+            todo: { ...currentTodo },
+            id: currentUser.user.id,
+            publicFromForm: true,
+          })
+        );
+      }
+
+      setNewTodo(false);
+    }
+    firstRender.current = true;
+  }, [newTodo]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (user.currentUser.name)
+
+    if (currentUser.user.name)
       dispatch(addTodo({ ...value, name: e.target.name.value }));
     else dispatch(addTodo(value));
+
+    setNewTodo(true);
 
     reset();
   };
 
   const handleSuccessMessage = () => {
-    if (user.currentUser.name)
-      setTimeout(() => {
-        dispatch(removeUserAuthStatus());
-      }, 2000);
+    if (currentUser.user.name) {
+      const message = `Welcome ${currentUser.user.name} 😉`;
 
-    const message = `Welcome ${user.currentUser.name} 😉`;
-
-    return <SnackBar message={message} />;
+      return <Message message={message} type="success" />;
+    }
   };
 
   return (
     <>
-      {user.status.success && handleSuccessMessage()}
+      {currentUser.status.success && handleSuccessMessage()}
 
       <Paper
         style={{
@@ -58,12 +84,12 @@ function TodoForm() {
             id="my-name"
             name="name"
             value={
-              user.currentUser.name ? user.currentUser.name : value?.name || ''
+              currentUser.user.name ? currentUser.user.name : value?.name || ''
             }
             aria-describedby="my-helper-text"
             onChange={handleValue}
             fullWidth
-            disabled={user.currentUser.name ? true : false}
+            disabled={currentUser.user.name ? true : false}
           />
           <TextField
             name="description"
