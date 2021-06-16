@@ -6,7 +6,7 @@
 
 # Live demo
 
-> https://vibrant-jones-a75ccc.netlify.app/
+> https://zen-meninsky-4e862b.netlify.app/
 
 ![Design preview for the  coding challenge](./Screenshot_1.jpg)
 

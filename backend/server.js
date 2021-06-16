@@ -6,7 +6,7 @@ const publicController = require('./controllers/publicController');
 const cors = require('cors');
 
 // load config files
-require('dotenv').config({ path: './config/.env' });
+//require('dotenv').config({ path: './config/.env' });
 //connect to DB
 serverConnection();
 
